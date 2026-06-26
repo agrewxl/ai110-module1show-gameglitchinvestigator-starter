@@ -61,13 +61,14 @@ AI helped me design the tests by suggesting the specific input/expected pairs th
 
 ## 4. What did you learn about Streamlit and state?
 
-- How would you explain Streamlit "reruns" and session state to a friend who has never used Streamlit?
+The biggest thing I learned is that Streamlit re-runs the *entire* `app.py` from top to bottom every single time you interact with the page — click a button, type in a box, change the dropdown. I'd explain it to a friend like this: imagine your whole script is re-read out loud from scratch on every click, so any normal variable you set is forgotten the instant the next click happens. That's why the secret number "had commitment issues" — if it weren't stored specially, it would be re-rolled on every rerun. `st.session_state` is the fix: it's a little dictionary that *survives* between reruns, like a backpack you carry across each restart. So the secret, score, attempts, and status all have to live in `st.session_state` (and only be initialized if they aren't already there) so they persist while everything else gets rebuilt. Understanding this also explained the New Game bug: resetting one key in session state isn't enough — you have to reset every key that carries state, or stale values leak into the "new" game.
 
 ---
 
 ## 5. Looking ahead: your developer habits
 
-- What is one habit or strategy from this project that you want to reuse in future labs or projects?
-  - This could be a testing habit, a prompting strategy, or a way you used Git.
-- What is one thing you would do differently next time you work with AI on a coding task?
-- In one or two sentences, describe how this project changed the way you think about AI generated code.
+The habit I most want to keep is **writing a failing regression test before I trust a fix**. Reproducing the bug as a test first (e.g. an int guess vs a string secret) meant I knew exactly when it was truly fixed, and the test stays around to stop the bug from coming back. I also want to keep committing in small, labeled steps — one commit for logging the bugs, one for the fixes, one for docs — because the history tells the story of my reasoning.
+
+One thing I'd do differently is **give the AI more context up front and trust its first answer less**. Early on I accepted suggestions a bit too quickly; I got better results once I attached both `app.py` and `logic_utils.py` together and explicitly told it about the existing tests, so it stopped proposing fixes that would break them.
+
+This project changed how I see AI-generated code: it's a fast, confident *first draft*, not a finished product. The starter code literally claimed to be "production-ready" and was unplayable — so now I treat AI output as something I have to read, question, and verify with tests rather than something I can paste in and ship.

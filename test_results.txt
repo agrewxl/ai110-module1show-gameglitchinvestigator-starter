@@ -1,0 +1,14 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.13.14, pytest-9.1.1, pluggy-1.6.0 -- /Library/Frameworks/Python.framework/Versions/3.13/bin/python3
+cachedir: .pytest_cache
+rootdir: /Users/abhaygrewal/Desktop/Projects/ai110-module1show-gameglitchinvestigator-starter
+plugins: anyio-4.14.1
+collecting ... collected 5 items
+
+tests/test_game_logic.py::test_winning_guess PASSED                      [ 20%]
+tests/test_game_logic.py::test_guess_too_high PASSED                     [ 40%]
+tests/test_game_logic.py::test_guess_too_low PASSED                      [ 60%]
+tests/test_game_logic.py::test_secret_as_string_compares_numerically PASSED [ 80%]
+tests/test_game_logic.py::test_hint_message_matches_outcome PASSED       [100%]
+
+============================== 5 passed in 0.01s ===============================
