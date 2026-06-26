@@ -35,6 +35,10 @@ def check_guess(guess, secret):
 
     outcome: "Win", "Too High", or "Too Low"
     """
+    # FIX: app.py used to turn the secret into a str on even turns, so an int
+    # guess was compared lexicographically (28 < "27" as text). With my AI
+    # assistant I traced the silent TypeError fallback and coerced both sides
+    # to int here so the comparison is always numeric.
     guess = int(guess)
     secret = int(secret)
 
@@ -47,6 +51,9 @@ def check_guess(guess, secret):
 
 def message_for_outcome(outcome: str):
     """Return the player-facing hint that matches an outcome."""
+    # FIX: the original hints were backwards ("Too High" showed "Go HIGHER!").
+    # The AI suggested swapping the strings; I verified the mapping by hand and
+    # added test_hint_message_matches_outcome to lock it in.
     return {
         "Win": "🎉 Correct!",
         "Too High": "📉 Go LOWER!",

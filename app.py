@@ -37,6 +37,9 @@ st.sidebar.caption(f"Attempts allowed: {attempt_limit}")
 
 def start_new_game():
     """Reset every piece of game state for a fresh round."""
+    # FIX: the old "New Game" only reset attempts, so status/score/history
+    # leaked across rounds and a lost game stayed locked. Refactored into one
+    # helper (AI-suggested) that resets everything and respects the difficulty range.
     st.session_state.secret = random.randint(low, high)
     st.session_state.attempts = 0
     st.session_state.score = 0

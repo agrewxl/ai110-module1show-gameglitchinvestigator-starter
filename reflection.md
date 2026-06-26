@@ -32,18 +32,30 @@ Document at least 3 bugs you found. Add rows as needed.
 
 ## 2. How did you use AI as a teammate?
 
-- Which AI tools did you use on this project (for example: ChatGPT, Gemini, Copilot)?
-- Give one example of an AI suggestion that was correct (including what the AI suggested and how you verified the result).
-- Give one example of an AI suggestion that was incorrect or misleading (including what the AI suggested and how you verified the result).
+I used an AI coding assistant in the editor (chat + agent edits) as my debugging partner. I worked one bug per chat so it stayed focused, attached `app.py` and `logic_utils.py` together so it could see how the UI and logic related, and reviewed every diff before accepting it.
+
+**A correct suggestion.** When I asked why no number ever won, the AI pointed at the lines in `app.py` that did `secret = str(st.session_state.secret)` on even attempts and explained that comparing an `int` guess to a `str` secret raised a `TypeError` that the `check_guess` fallback silently swallowed, leaving a lexicographic string comparison. Its fix was to stop stringifying the secret and coerce both values to `int` inside `check_guess`. I verified this two ways: I wrote `test_secret_as_string_compares_numerically` (asserting `check_guess(28, "27") == "Too High"` and `check_guess(27, "27") == "Win"`) and it passed, and I played the live game — the secret shown in the debug panel was finally winnable.
+
+**An incorrect / misleading suggestion.** While fixing the backwards hints, the assistant first suggested I just swap the *outcome labels* (return "Too Low" when `guess > secret`). That would have made the hint text read correctly but broken the meaning of the outcome — and it would have failed the existing `test_guess_too_high` test (which expects `check_guess(60, 50) == "Too High"`). I caught it by re-reading the test file, then chose the correct fix instead: keep the outcomes accurate and only correct the player-facing message in `message_for_outcome` ("Too High" → "Go LOWER!"). Running pytest confirmed the original tests still passed, proving the AI's first idea was the wrong layer to change.
 
 ---
 
 ## 3. Debugging and testing your fixes
 
-- How did you decide whether a bug was really fixed?
-- Describe at least one test you ran (manual or using pytest)  
-  and what it showed you about your code.
-- Did AI help you design or understand any tests? How?
+I decided a bug was really fixed only when it was locked down by a test *and* confirmed in the live app — not just because the code "looked right." For each fix I added a regression test that would fail on the old behavior, then ran `pytest tests/ -v`.
+
+The most useful test was `test_secret_as_string_compares_numerically`. Passing it proved the impossible-win bug was gone, because the test reproduces the exact broken case (an int guess vs a string secret) and asserts a numeric result. I also added `test_hint_message_matches_outcome` to guarantee "Too High" tells the player to go LOWER. The full suite went from 3 to 5 tests, all passing:
+
+```
+tests/test_game_logic.py::test_winning_guess PASSED
+tests/test_game_logic.py::test_guess_too_high PASSED
+tests/test_game_logic.py::test_guess_too_low PASSED
+tests/test_game_logic.py::test_secret_as_string_compares_numerically PASSED
+tests/test_game_logic.py::test_hint_message_matches_outcome PASSED
+========================= 5 passed in 0.01s =========================
+```
+
+AI helped me design the tests by suggesting the specific input/expected pairs that would target each bug (e.g. "test 28 against a string '27'"), but I decided *what* the correct behavior should be and reviewed each assertion before running it. Finally I ran `streamlit run app.py` and played a full round — winning, losing, and clicking "New Game" — to confirm the fixes hold in the real UI, not just in the test harness.
 
 ---
 
